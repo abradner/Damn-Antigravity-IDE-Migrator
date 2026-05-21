@@ -35,9 +35,14 @@ def setup_logging(verbose: bool) -> None:
     root_logger.addHandler(file_handler)
 
 def is_process_running(process_name: str) -> bool:
-    """Checks if a process is running on Windows using tasklist."""
+    """Checks if a named process is currently running (cross-platform)."""
     try:
-        output = subprocess.check_output("tasklist", shell=True).decode("utf-8", errors="ignore")
+        if sys.platform == "win32":
+            output = subprocess.check_output("tasklist", shell=True).decode("utf-8", errors="ignore")
+        else:
+            output = subprocess.check_output(
+                ["ps", "-ax", "-o", "comm="], stderr=subprocess.DEVNULL
+            ).decode("utf-8", errors="ignore")
         return process_name.lower() in output.lower()
     except Exception:
         return False
@@ -110,9 +115,13 @@ def main() -> None:
         sys.exit(0)
         
     # Standard migration flow
-    # Check if target programs are running
-    is_old_running = is_process_running("Antigravity.exe")
-    is_new_running = is_process_running("Antigravity IDE.exe")
+    # Check if target programs are running (process names differ by OS)
+    if sys.platform == "win32":
+        is_old_running = is_process_running("Antigravity.exe")
+        is_new_running = is_process_running("Antigravity IDE.exe")
+    else:
+        is_old_running = is_process_running("Antigravity")
+        is_new_running = is_process_running("Antigravity IDE")
     
     if is_old_running or is_new_running:
         running_apps = []

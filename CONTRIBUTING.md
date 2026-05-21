@@ -12,7 +12,7 @@ To help us understand and resolve issues efficiently, please follow these guidel
 
 ### Bug Reports
 When reporting a bug, please include the following details:
-1. **Environment**: Your OS version (e.g., Windows 10/11) and legacy Antigravity version.
+1. **Environment**: Your OS version (e.g., Windows 10/11, macOS 13+) and legacy Antigravity version.
 2. **Steps to Reproduce**: Provide step-by-step instructions on what actions cause the issue.
 3. **Logs**: Attach the contents of the `migration.log` file generated in the project root directory, or paste the full console error output.
 
@@ -40,7 +40,7 @@ This tool is designed to be lightweight and zero-dependency, using only the **Py
 * **Running Unit Tests**:
   Always verify that your changes do not break existing behaviors by running the tests:
   ```bash
-  python -m unittest tests/test_migration.py
+  python3 -m unittest tests/test_migration.py
   ```
 
 ## 4. Coding Guidelines

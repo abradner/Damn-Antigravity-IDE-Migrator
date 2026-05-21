@@ -40,15 +40,23 @@ This tool requires **Python 3.8+** with no external dependencies (uses standard 
 
 ## Usage
 
-On Windows, you can use the provided batch files for convenient, one-click execution via double-click.
+Convenience launcher scripts are provided for each platform.
+
+**Windows** — use the `.bat` files (double-click or run from Command Prompt).  
+**macOS / Linux** — use the `.sh` files (run from Terminal). Make them executable first if needed:
+```bash
+chmod +x *.sh
+```
 
 ### 1. Perform a Dry-Run Simulation (Optional)
 Simulate the migration process safely without modifying any files or databases, allowing you to preview which files will copy and which settings will merge. Since no actual data is altered, this is useful to run before starting the real migration.
-- **How to Run**: Double-click the `00_migrate-dry-run.bat` file in the root directory.
+- **Windows**: Double-click `00_migrate-dry-run.bat`
+- **macOS / Linux**: Run `./00_migrate-dry-run.sh`
 
 ### 2. Run the Standard Migration (Required)
 Run the actual migration process. (This automatically creates a safe backup of the target folders.)
-- **How to Run**: Double-click the `01_migrate.bat` file in the root directory.
+- **Windows**: Double-click `01_migrate.bat`
+- **macOS / Linux**: Run `./01_migrate.sh`
 
 > [!TIP]
 > **Post-Migration Startup Recommendation**
@@ -56,14 +64,19 @@ Run the actual migration process. (This automatically creates a safe backup of t
 
 ### 3. Restore from a Backup (Recovery on Issues)
 If an error occurs or you need to revert to a previous configuration backup:
-- **How to Run**: Run `02_restore.bat` followed by the backup folder path as an argument.
+- **Windows**: Run `02_restore.bat` followed by the backup folder path as an argument.
   ```cmd
   02_restore.bat "C:\Users\<Username>\AppData\Roaming\Antigravity IDE\migration_backups\<timestamp>"
+  ```
+- **macOS**: Run `./02_restore.sh` followed by the backup folder path as an argument.
+  ```bash
+  ./02_restore.sh "$HOME/Library/Application Support/Antigravity IDE/migration_backups/<timestamp>"
   ```
 
 ### 4. Delete All Backups (Optional)
 If you no longer need the backup files after a successful migration and want to free up disk space:
-- **How to Run**: Double-click the `03_clean-backups.bat` file in the root directory.
+- **Windows**: Double-click `03_clean-backups.bat`
+- **macOS / Linux**: Run `./03_clean-backups.sh`
 
 ---
 
@@ -74,19 +87,24 @@ Available command-line flags and execution examples when running the migration s
 ### 1. Usage Examples
 - **Show Help Message**:
   ```bash
-  python -m src.main --help
+  python3 -m src.main --help
   ```
 - **Run Dry-run Simulation (with verbose logging)**:
   ```bash
-  python -m src.main --dry-run --verbose
+  python3 -m src.main --dry-run --verbose
   ```
 - **Restore from Backup Directory**:
-  ```bash
-  python -m src.main --restore "C:\Users\<Username>\AppData\Roaming\Antigravity IDE\migration_backups\<timestamp>"
-  ```
+  - Windows:
+    ```bash
+    python3 -m src.main --restore "C:\Users\<Username>\AppData\Roaming\Antigravity IDE\migration_backups\<timestamp>"
+    ```
+  - macOS:
+    ```bash
+    python3 -m src.main --restore "$HOME/Library/Application Support/Antigravity IDE/migration_backups/<timestamp>"
+    ```
 - **Delete All Backups (Cleanup)**:
   ```bash
-  python -m src.main --cleanup
+  python3 -m src.main --cleanup
   ```
 
 ### 2. Command-Line Options
@@ -104,7 +122,7 @@ options:
 
 ## Project Architecture
 
-- `src/config.py`: Resolves environment paths dynamically (handles Windows APPDATA and profile folders).
+- `src/config.py`: Resolves app configuration paths dynamically for each OS (Windows `%APPDATA%`, macOS `~/Library/Application Support`, Linux `~/.config`).
 - `src/backup.py`: Handles automatic ZIP/directory backups and rollback routines.
 - `src/file_handler.py`: Merges `settings.json`, copies extensions, rewrites paths in `extensions.json`, and synchronizes `.gemini` folder structures.
 - `src/database.py`: Performs SQLite key insertion and Protobuf concatenation merges.
@@ -116,11 +134,11 @@ options:
 
 Run unit tests to verify the migration logic under simulated directory structures:
 ```bash
-python -m unittest tests/test_migration.py
+python3 -m unittest tests/test_migration.py
 ```
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](file:///d:/Dev/Damn-Antigravity-Converstation-Restore/LICENSE) - see the [LICENSE](file:///d:/Dev/Damn-Antigravity-Converstation-Restore/LICENSE) file for details.
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.

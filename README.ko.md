@@ -40,15 +40,23 @@
 
 ## 사용 방법
 
-Windows 환경에서는 배치 파일을 사용하여 더블 클릭(원클릭)만으로 마이그레이션을 안전하게 실행하고 제어할 수 있습니다.
+각 플랫폼에 맞는 런처 스크립트가 제공됩니다.
+
+**Windows** — `.bat` 파일 사용 (더블 클릭하거나 명령 프롬프트에서 실행).  
+**macOS / Linux** — `.sh` 파일 사용 (터미널에서 실행). 필요한 경우 먼저 실행 권한을 부여하세요:
+```bash
+chmod +x *.sh
+```
 
 ### 1. Dry-Run 시뮬레이션 수행 (선택 사항)
 실제 파일이나 데이터베이스를 수정하지 않고, 어떤 파일이 복사되고 어떤 설정이 병합되는지 안전하게 모의 시뮬레이션을 수행합니다. 실제 데이터가 변경되지 않으므로, 작업 진행 전에 미리 확인하고 싶을 때 유용합니다.
-- **실행 방법**: 루트 폴더에 있는 `00_migrate-dry-run.bat` 파일을 더블 클릭하여 실행합니다.
+- **Windows**: `00_migrate-dry-run.bat` 파일을 더블 클릭합니다.
+- **macOS / Linux**: `./00_migrate-dry-run.sh` 를 실행합니다.
 
 ### 2. 마이그레이션 실행 (필수)
 실제 마이그레이션을 실행합니다. (실행 시 대상 폴더의 안전 백업이 자동으로 생성됩니다.)
-- **실행 방법**: 루트 폴더에 있는 `01_migrate.bat` 파일을 더블 클릭하여 실행합니다.
+- **Windows**: `01_migrate.bat` 파일을 더블 클릭합니다.
+- **macOS / Linux**: `./01_migrate.sh` 를 실행합니다.
 
 > [!TIP]
 > **성공적인 이식을 위한 첫 실행 권장 수칙**
@@ -56,14 +64,19 @@ Windows 환경에서는 배치 파일을 사용하여 더블 클릭(원클릭)�
 
 ### 3. 백업 파일로부터 복원 (문제 발생 시 복구용)
 마이그레이션 도중 오류가 발생하거나 수동으로 백업된 특정 설정을 되돌려야 하는 경우:
-- **실행 방법**: 복원하고자 하는 백업 폴더 경로를 `02_restore.bat` 뒤에 인자로 지정하여 실행합니다.
+- **Windows**: 복원하고자 하는 백업 폴더 경로를 `02_restore.bat` 뒤에 인자로 지정하여 실행합니다.
   ```cmd
   02_restore.bat "C:\Users\<사용자명>\AppData\Roaming\Antigravity IDE\migration_backups\<타임스탬프>"
+  ```
+- **macOS**: 백업 폴더 경로를 `./02_restore.sh` 뒤에 인자로 지정하여 실행합니다.
+  ```bash
+  ./02_restore.sh "$HOME/Library/Application Support/Antigravity IDE/migration_backups/<타임스탬프>"
   ```
 
 ### 4. 백업 파일 전체 정리 (선택 사항)
 마이그레이션 완료 후, 보관 중인 백업 파일을 모두 일괄 삭제하고 저장공간을 정리하고자 할 때 사용합니다.
-- **실행 방법**: 루트 폴더에 있는 `03_clean-backups.bat` 파일을 더블 클릭하여 실행합니다.
+- **Windows**: `03_clean-backups.bat` 파일을 더블 클릭합니다.
+- **macOS / Linux**: `./03_clean-backups.sh` 를 실행합니다.
 
 ---
 
@@ -74,19 +87,24 @@ Windows 환경에서는 배치 파일을 사용하여 더블 클릭(원클릭)�
 ### 1. 사용 예시
 - **도움말 출력**:
   ```bash
-  python -m src.main --help
+  python3 -m src.main --help
   ```
 - **Dry-run 시뮬레이션 직접 수행 (상세 로그 포함)**:
   ```bash
-  python -m src.main --dry-run --verbose
+  python3 -m src.main --dry-run --verbose
   ```
 - **백업 파일로부터 복원 수행**:
-  ```bash
-  python -m src.main --restore "C:\Users\<사용자명>\AppData\Roaming\Antigravity IDE\migration_backups\<타임스탬프>"
-  ```
+  - Windows:
+    ```bash
+    python3 -m src.main --restore "C:\Users\<사용자명>\AppData\Roaming\Antigravity IDE\migration_backups\<타임스탬프>"
+    ```
+  - macOS:
+    ```bash
+    python3 -m src.main --restore "$HOME/Library/Application Support/Antigravity IDE/migration_backups/<타임스탬프>"
+    ```
 - **백업 파일 전체 삭제 (정리)**:
   ```bash
-  python -m src.main --cleanup
+  python3 -m src.main --cleanup
   ```
 
 ### 2. CLI 옵션 목록
@@ -104,7 +122,7 @@ options:
 
 ## 프로젝트 구조
 
-- `src/config.py`: Windows 환경 변수를 통해 마이그레이션 관련 폴더 경로들을 동적 분석 및 리졸브합니다.
+- `src/config.py`: 각 OS에 맞는 앱 설정 폴더 경로를 동적으로 리졸브합니다 (Windows: `%APPDATA%`, macOS: `~/Library/Application Support`, Linux: `~/.config`).
 - `src/backup.py`: 자동 백업 파일 관리 및 롤백 메서드를 제공합니다.
 - `src/file_handler.py`: 설정 JSON 병합, 익스텐션 복사 및 메타데이터 경로 수정, `.gemini` 하위 파일 동기화를 담당합니다.
 - `src/database.py`: SQLite DB 연결, 누락 키 복사 및 Protobuf 바이너리 병합 로직을 구현합니다.
@@ -116,11 +134,11 @@ options:
 
 시뮬레이션 디렉토리 구조 위에서 안정성 검증을 위한 테스트 케이스를 수행합니다:
 ```bash
-python -m unittest tests/test_migration.py
+python3 -m unittest tests/test_migration.py
 ```
 
 ---
 
 ## 라이선스
 
-이 프로젝트는 [MIT License](file:///d:/Dev/Damn-Antigravity-Converstation-Restore/LICENSE) 라이선스 하에 배포 및 사용이 가능합니다. 자세한 사항은 [LICENSE](file:///d:/Dev/Damn-Antigravity-Converstation-Restore/LICENSE) 파일을 참조하세요.
+이 프로젝트는 [MIT License](LICENSE) 라이선스 하에 배포 및 사용이 가능합니다. 자세한 사항은 [LICENSE](LICENSE) 파일을 참조하세요.

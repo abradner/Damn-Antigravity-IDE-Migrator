@@ -11,7 +11,7 @@
 
 ### 버그 리포트 (Bug Report)
 버그를 제보하실 때는 문제 해결을 위해 아래 내용을 꼭 적어주세요:
-1. **실행 환경**: OS 버전 (예: Windows 10/11) 및 기존 Antigravity 버전
+1. **실행 환경**: OS 버전 (예: Windows 10/11, macOS 13+) 및 기존 Antigravity 버전
 2. **재현 방법**: 어떤 순서로 버그가 발생했는지 단계별로 적어주세요.
 3. **로그 정보**: 프로젝트 루트 디렉터리에 기록된 `migration.log` 파일 내용이나 터미널 오류 메세지 전문을 첨부해 주세요.
 
@@ -37,7 +37,7 @@
 * **단위 테스트 실행**:
   코드 변경 후에는 반드시 아래 명령어를 통해 기존 기능이 깨지지 않는지 검증해야 합니다.
   ```bash
-  python -m unittest tests/test_migration.py
+  python3 -m unittest tests/test_migration.py
   ```
 
 ## 4. 코드 작성 규칙

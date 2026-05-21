@@ -133,6 +133,41 @@ class TestMigrationTool(unittest.TestCase):
             "/c:/Users/User/.antigravity-ide/extensions/my.dummy-extension-1.0.0"
         )
 
+    def test_extensions_migration_macos_paths(self):
+        """Verifies that macOS-style extension paths are correctly rewritten."""
+        old_ext_folder = os.path.join(self.paths.old_dot, "extensions", "my.macos-extension-1.0.0")
+        os.makedirs(old_ext_folder)
+        with open(os.path.join(old_ext_folder, "package.json"), "w") as f:
+            f.write('{"name": "macos-dummy"}')
+
+        old_json = [
+            {
+                "identifier": {"id": "my.macos-extension"},
+                "version": "1.0.0",
+                "location": {
+                    "path": "/Users/username/.antigravity/extensions/my.macos-extension-1.0.0"
+                }
+            }
+        ]
+        new_json = []
+
+        with open(os.path.join(self.paths.old_dot, "extensions", "extensions.json"), "w") as f:
+            json.dump(old_json, f)
+        with open(os.path.join(self.paths.new_dot, "extensions", "extensions.json"), "w") as f:
+            json.dump(new_json, f)
+
+        migrator = FileMigrator(self.paths)
+        migrator.migrate_extensions()
+
+        with open(os.path.join(self.paths.new_dot, "extensions", "extensions.json"), "r") as f:
+            result = json.load(f)
+
+        migrated = next(x for x in result if x["identifier"]["id"] == "my.macos-extension")
+        self.assertEqual(
+            migrated["location"]["path"],
+            "/Users/username/.antigravity-ide/extensions/my.macos-extension-1.0.0"
+        )
+
     def test_gemini_data_sync(self):
         # Create a conversation file in old
         convo_file = os.path.join(self.paths.old_gemini, "conversations", "convo1.pb")
